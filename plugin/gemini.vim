@@ -19,7 +19,7 @@ set cpo&vim
 " ============================================================================
 
 " Comando base a ser executado no terminal.
-let g:gemini_cmd_base = get(g:, 'gemini_cmd_base', 'gemini cli')
+let g:gemini_cmd_base = get(g:, 'gemini_cmd_base', 'gemini')
 
 " Largura da janela do terminal em colunas (0 para usar a divisão padrão).
 let g:gemini_terminal_width = get(g:, 'gemini_terminal_width', 60)
