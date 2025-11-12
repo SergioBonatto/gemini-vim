@@ -6,7 +6,7 @@
 " ============================================================================
 
 if exists('g:loaded_gemini_runner') || &compatible
-    finish
+finish
 endif
 let g:loaded_gemini_runner = 1
 
@@ -30,41 +30,43 @@ let g:gemini_terminal_width = get(g:, 'gemini_terminal_width', 60)
 
 " Executa o comando Gemini em um split vertical.
 function! s:RunGeminiSplit() abort
-    " Verifica se o Vim/Neovim suporta o terminal embutido
-    if !has('terminal')
-        echohl ErrorMsg
-        echo "Erro: Esta versão do Vim/Neovim não suporta o terminal embutido."
+" Verifica se o Vim/Neovim suporta o terminal embutido
+if !has('terminal')
+    echohl ErrorMsg
+    echo "Erro: Esta versão do Vim/Neovim não suporta o terminal embutido."
+    echohl None
+    return
+endif
+
+" 1. Salva o arquivo atual (boa prática antes de mudar o contexto)
+if &modified
+    try
+        write
+    catch /^Vim\%((\a\+)\)\=:E/
+        echohl WarningMsg
+        echo "Aviso: Não foi possível salvar o arquivo."
         echohl None
-        return
-    endif
+    endtry
+endif
 
-    " 1. Salva o arquivo atual (boa prática antes de mudar o contexto)
-    if &modified
-        try
-            write
-        catch /^Vim\%((\a\+)\)\=:E/
-            echohl WarningMsg
-            echo "Aviso: Não foi possível salvar o arquivo."
-            echohl None
-        endtry
-    endif
+" 2. Constrói o comando: Split vertical e abre o terminal com o comando.
+" O 'botright' garante que o novo split apareça à direita.
+let l:cmd_to_exec = 'vertical botright terminal ' . g:gemini_cmd_base
 
-    " 2. Constrói o comando: Split vertical e abre o terminal com o comando.
-    " O 'botright' garante que o novo split apareça à direita.
-    let l:cmd_to_exec = 'vertical botright terminal ' . g:gemini_cmd_base
+" 3. Executa o split e o terminal.
+execute l:cmd_to_exec
+" Move o foco para a janela recém-criada (à direita) para que você possa digitar
+wincmd l
 
-    " 3. Executa o split e o terminal.
-    execute l:cmd_to_exec
-
-    " 4. Redimensiona a janela do terminal, se configurado.
-    if g:gemini_terminal_width > 0
-        " Move o foco para a janela recém-criada (à direita)
-        wincmd l
-        " Redimensiona o split verticalmente
-        execute 'vertical resize ' . g:gemini_terminal_width
-        " Retorna o foco para a janela do código
-        wincmd h
-    endif
+" 4. Redimensiona a janela do terminal, se configurado.
+if g:gemini_terminal_width > 0
+    " Move o foco para a janela recém-criada (à direita)
+    wincmd l
+    " Redimensiona o split verticalmente
+    execute 'vertical resize ' . g:gemini_terminal_width
+    " Retorna o foco para a janela do código
+    wincmd h
+endif
 endfunction
 
 " ============================================================================
